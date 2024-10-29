@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define SAMPLE_RATE 44100 // Samples per second
 #define AMPLITUDE 128      // Amplitude of the wave (0 to 128 for signed 8-bit audio)
 #define FREQUENCY 440      // Frequency of the sine wave in Hz
@@ -11,13 +12,18 @@
 // Prototype for our audio callback
 void my_audio_callback(void *userdata, Uint8 *stream, int len);
 
-void sinWaver(Uint8* audio_pos, Uint32 audio_len, Uint32* notes, size_t note_size ){
+void sinWaver(Uint8* audio_pos, Uint32 audio_len, Uint32* notes, size_t note_size, size_t n ){
     for (Uint32 i = 0; i < audio_len; i++) {
             for (int n_i = 0 ; n_i < note_size ; n_i ++){
-                if( i < (audio_len * ( n_i + 1) / note_size) && i > (audio_len * ( n_i) / note_size) ) audio_pos[i] = (Uint8)(AMPLITUDE * (sin(2.0 * M_PI * notes[n_i] * (i / (double)SAMPLE_RATE)) + 1) / 2);
+                if( i < (audio_len * ( n_i + 1) / note_size) && i > (audio_len * ( n_i) / note_size) ) {
+                    if (i % n != 0) {
+                        audio_pos[i] = (Uint8)(AMPLITUDE * (sin(2.0 * M_PI * notes[n_i] * (i / (double)SAMPLE_RATE)) + 1) / 2);
+                } 
             }         
         }      
     }
+
+
 // Variable declarations
 static Uint8 *audio_pos; // Global pointer to the audio buffer to be played
 static Uint32 audio_len; // Remaining length of the sample we have to play
@@ -50,8 +56,14 @@ int main(int argc, char* argv[]) {
     audio_pos = (Uint8 *)malloc(audio_len); // Allocate memory for the audio buffer
 
     // Generate the sine wave
-    Uint32 notes[] = {440, 523, 587, 659};
-    sinWaver(audio_pos, audio_len, notes, 4); 
+    Uint32 notes[][2] = {
+        {440, 25},
+        {265, 25},
+        {566, 25},
+         {233, 25}
+        };
+
+    sinWaver(audio_pos, audio_len, notes, 4, 89); 
 
     // Start playing
     SDL_PauseAudio(0);
