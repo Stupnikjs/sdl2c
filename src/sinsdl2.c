@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
         {440, 25},
         {265, 25},
         {566, 25},
-         {233, 25}
+        {233, 25}
         };
 
     sinWaver(audio_pos, audio_len, notes, 4, 89); 
